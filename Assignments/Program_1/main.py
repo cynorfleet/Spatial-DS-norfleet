@@ -1,3 +1,12 @@
+__author__ = "Christian Norfleet"
+__copyright__ = "Copyright 2017, Christian's Shit"
+__credits__ = ["Dr. Griffin"]
+__license__ = "GPL"
+__version__ = "1.0.1"
+__maintainer__ = "Christian Norfleet"
+__email__ = "cynorfleet@gmail.com"
+__status__ = "Production"
+
 import json
 import os,sys
 import pygame
@@ -448,6 +457,30 @@ def draw_text(country_name, location):
     text = font.render(country_name, True, (0,0,0))
     screen.blit(text, location)
 
+def bound_box(countrypoints):
+    box = {}
+    xmin = 99999
+    xmax = -99999
+    ymin = 99999
+    ymax = -99999
+    for x,y in countrypoints:
+        if x < xmin:
+            xmin = x
+        if x > xmax:
+            xmax = x
+        if y < ymin:
+            ymin = y
+        if y > ymax:
+            ymax = y
+    
+    box['min'] = (xmin,ymin)
+    box['max'] = (xmax,ymax)
+    box['width']= xmax-xmin
+    box['height']=ymax-ymin
+
+    pygame.draw.rect(screen,pygame.Color("black"), (xmin,ymin, box['width'], box['height']), 5)    
+    print (box)
+    return box
 
 if __name__ == '__main__':
     pygame.font.init()
@@ -510,6 +543,7 @@ if __name__ == '__main__':
                             gd.draw_polygons()
                             draw_text(poly,event.pos)
                             pygame.draw.lines(screen,(pygame.Color("black")),False,index,3)
+                            bound_box(index)
                             print("U clicked on ", poly)
                             break
             pygame.display.flip()
