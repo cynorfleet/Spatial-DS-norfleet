@@ -10,7 +10,7 @@ __status__ = "Production"
 import json
 import os,sys
 import pygame
-import random 
+import random
 import math
 import pprint as pp
 
@@ -25,7 +25,7 @@ class Colors(object):
     Opens a json file of web colors.
     """
     def __init__(self,file_name):
-        
+
         with open(file_name, 'r') as content_file:
             content = content_file.read()
 
@@ -97,7 +97,7 @@ class StateBorders(object):
         """
         Returns a polygon of a single state from the US.
         Args:
-            name (string): Name of a single state. 
+            name (string): Name of a single state.
 
         Returns:
             json (string object): Json representation of a state
@@ -116,7 +116,7 @@ class StateBorders(object):
                         np.append((p[0],p[1]))
                     t.append(np)
                 return(t)
-                
+
         return None
 
     def get_continental_states(self):
@@ -149,7 +149,7 @@ class StateBorders(object):
         """
         Returns boolean if key exists in json
         Args:
-            key (string) : some identifier 
+            key (string) : some identifier
 
         Returns:
             T/F (bool) : True = Key exists
@@ -173,7 +173,7 @@ class WorldCountries(object):
             content = content_file.read()
 
         self.content = json.loads(content)
-    
+
     def get_all_countries(self):
         """
         Returns a list of all the countries us states.
@@ -181,7 +181,7 @@ class WorldCountries(object):
             None
 
         Returns:
-            list (list object): List of Json objects representing each country 
+            list (list object): List of Json objects representing each country
 
         Usage:
             wc = WorldCountries()
@@ -202,7 +202,7 @@ class WorldCountries(object):
             None
 
         Returns:
-            list (list object): List of Json object representing a country 
+            list (list object): List of Json object representing a country
 
         Usage:
             wc = WorldCountries()
@@ -213,13 +213,13 @@ class WorldCountries(object):
         for c in self.content['features']:
             if c['id'].lower() == id.lower() or c['properties']['name'].lower() == id.lower():
                 country.append(c['geometry']['coordinates'])
-        return country  
+        return country
 
     def key_exists(self,key):
         """
         Returns boolean if key exists in json
         Args:
-            key (string) : some identifier 
+            key (string) : some identifier
 
         Returns:
             T/F (bool) : True = Key exists
@@ -230,17 +230,17 @@ class WorldCountries(object):
             elif c['properties']['name'].lower() == key.lower():
                 return True
         return False
-            
+
 
 #####################################################################################
 #####################################################################################
 
 class DrawGeoJson(object):
-    __shared_state = {}        
+    __shared_state = {}
     def __init__(self,screen,width,height):
         """
-        Converts lists (polygons) of lat/lon pairs into pixel coordinates in order to do some 
-        simple drawing using pygame. 
+        Converts lists (polygons) of lat/lon pairs into pixel coordinates in order to do some
+        simple drawing using pygame.
         """
         self.__dict__ = self.__shared_state
 
@@ -304,7 +304,7 @@ class DrawGeoJson(object):
             if id not in self.adjusted_poly_dict:
                 self.adjusted_poly_dict[id] = []
             # append poly to dictionary with country as key (id).
-            self.adjusted_poly_dict[id].append(poly)   
+            self.adjusted_poly_dict[id].append(poly)
         for p in poly:
             x,y = p
             self.all_lons.append(x)
@@ -335,7 +335,7 @@ class DrawGeoJson(object):
 
         Returns:
             None
-        """ 
+        """
 
         for poly in self.polygons:
             adjusted = []
@@ -356,10 +356,10 @@ class DrawGeoJson(object):
 
         Returns:
             None
-        """  
+        """
         self.mapLonLeft = min(self.all_lons)
         self.mapLonRight = max(self.all_lons)
-        self.mapLonDelta = self.mapLonRight - self.mapLonLeft  
+        self.mapLonDelta = self.mapLonRight - self.mapLonLeft
         self.mapLatBottom = min(self.all_lats)
         self.mapLatBottomDegree = self.mapLatBottom * math.pi / 180.0
 
@@ -394,12 +394,12 @@ class DrawingFacade(object):
 
         Usage:
             df.add_polygons(['FRA','TX','ESP','AFG','NY','ME','Kenya'])
-        """ 
+        """
         for id in ids:
             if self.wc.key_exists(id):
                 self.__add_country(self.wc.get_country(id),id)
             elif self.sb.key_exists(id):
-                self.__add_state(self.sb.get_state(id),id)         
+                self.__add_state(self.sb.get_state(id),id)
 
     def __add_country(self,country,id=None):
         for polys in country:
@@ -449,7 +449,7 @@ def mercator_projection(latlng,zoom=0,tile_size=256):
     """
     x = (latlng[0] + 180) / 360 * tile_size
     y = ((1 - math.log(math.tan(latlng[1] * math.pi / 180) + 1 / math.cos(latlng[1] * math.pi / 180)) / math.pi) / 2 * pow(2, 0)) * tile_size
-   
+
     return (x,y)
 
 def draw_text(country_name, location):
@@ -472,13 +472,13 @@ def bound_box(countrypoints):
             ymin = y
         if y > ymax:
             ymax = y
-    
+
     box['min'] = (xmin,ymin)
     box['max'] = (xmax,ymax)
     box['width']= xmax-xmin
     box['height']=ymax-ymin
 
-    pygame.draw.rect(screen,pygame.Color("black"), (xmin,ymin, box['width'], box['height']), 5)    
+    pygame.draw.rect(screen,pygame.Color("black"), (xmin,ymin, box['width'], box['height']), 5)
     print (box)
     return box
 
@@ -493,11 +493,11 @@ if __name__ == '__main__':
         # use size passed in by user
         width = int(sys.argv[1])
         height = int(sys.argv[2])
-    
+
     # create an instance of pygame
     # "screen" is what will be used as a reference so we can
     # pass it to functions and draw to it.
-    screen = pygame.display.set_mode((width, height)) 
+    screen = pygame.display.set_mode((width, height))
 
     # Set title of window
     pygame.display.set_caption('Draw World Polygons')
@@ -512,7 +512,7 @@ if __name__ == '__main__':
     gd = DrawGeoJson(screen,width,height)
     df = DrawingFacade(width,height)
 
-    print(gd.__dict__)    
+    print(gd.__dict__)
 
     # Add countries and states to our drawing facade.
     df.add_polygons(['FRA','TX','ESP','AFG','NY'])
@@ -524,6 +524,15 @@ if __name__ == '__main__':
     gd.draw_polygons()
     # Call my new method to "adjust" the dictionary of polygons
     gd.adjust_poly_dictionary()
+
+    # get music from HD
+    for anthem in os.listdir('\Anthems'):
+
+    # Store anthem music in adjusted dict
+        for country in gd.adjusted_poly_dict:
+                if anthem.lower() in country.lower():
+                    (gd.adjusted_poly_dict[country])[anthem]=anthem
+
 
     # Main loop
     running = True
@@ -544,6 +553,14 @@ if __name__ == '__main__':
                             draw_text(poly,event.pos)
                             pygame.draw.lines(screen,(pygame.Color("black")),False,index,3)
                             bound_box(index)
+                            # try to play song
+                            try:
+                                anthem = (gd.adjusted_poly_dict[poly])[anthem]
+                                pygame.mixer.music.load(anthem)
+                                pygame.mixer.music.play(0)
+                            except:
+                                print("Song not avail")
+
                             print("U clicked on ", poly)
                             break
             pygame.display.flip()
