@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
 
 __copyright__ = "Copyright 2017"
 __version__ = "1.0.1"
 __maintainer__ = "Christian Norfleet"
+__credit__= "Dr. Terry Griffin"
 __email__ = "http://contact@deadlycheerio.com"
 __repo__ = "https://github.com/cynorfleet/REPONAME"
 
@@ -18,6 +18,7 @@ import json
 
 DIRPATH = os.path.dirname(os.path.realpath(__file__)) + '\\'
 SAVEPATH = DIRPATH + 'quakedata.json'
+ADJUSTPATH = DIRPATH + "quake-adjusted.json"
 MAPPATH = DIRPATH + 'earthquake_map.png'
 LOADINGbkg = DIRPATH + 'LOADING.jpg'
 
@@ -35,7 +36,7 @@ def clean_area(screen, origin, width, height, color):
 
 def convert_points(listofFloat):
     x, y, z = listofFloat
-    return [int(x),int(y),int(z)][:2]
+    return [int(x), int(y), int(z)][:2]
 
 
 if __name__ == '__main__':
@@ -44,6 +45,9 @@ if __name__ == '__main__':
     called quake modules (53)
     changed open path (57)
     """
+    pygame.font.init()
+    font = pygame.font.SysFont("comicsansms", 72)
+
     background_colour = (255, 255, 255)
     black = (0, 0, 0)
     (width, height) = (1024, 512)
@@ -58,14 +62,17 @@ if __name__ == '__main__':
     pygame.display.flip()
 
     if not os.path.isfile(SAVEPATH):
-        print('Grabbing Data')
+        status ='Grabbing Data'
+        pygame.time.wait(45)
         get_quake_points.execute(SAVEPATH, 1960, 7, endYr=2016)
-        print('Data Grab Complete')
-    print('Adjusting coordinates')
-    adjust_quake_points.execute(SAVEPATH)
-    print('Adjustment Complete')
+        status = 'Data Grab Complete'
+        status = 'Adjusting coordinates'
+        adjust_quake_points.execute(SAVEPATH)
+        status = 'Adjustment Complete'
+    else:
+        status = "Using previous data"
 
-    f = open(SAVEPATH, 'r')
+    f = open(ADJUSTPATH, 'r')
     points = json.loads(f.read())
 
     bg = pygame.image.load(MAPPATH)
@@ -74,16 +81,18 @@ if __name__ == '__main__':
     running = True
     while running:
         screen.blit(bg, (0, 0))
-        for data in points:
-            for p in data['features']:
-                p = convert_points(p['geometry']['coordinates'])
+        for p in points:
+                # p = convert_points(p['geometry']['coordinates'])
                 # print("Points are %s" % p)
-                pygame.draw.circle(
-                    screen, (255, 102, 0), p, 1, 0)
-                pygame.display.flip()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running=False
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    clean_area(screen, (0, 0), width,
-                                height, (255, 255, 255))
+            pygame.time.wait(10)
+            pygame.draw.circle(
+                screen, (255, 102, 0), p, 1, 0)
+            pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.image.save(
+                    screen, '.\\Assignments\\Program_3\\Quake.png')
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                clean_area(screen, (0, 0), width,
+                            height, (255, 255, 255))

@@ -80,9 +80,9 @@ def execute(savePath, startYr, magnitude_min, magnitude_max=None, endYr=2017):
 
     #years = [2017]
     for y in years:
-        print("Year:%s" % (y))
         r.append(get_earth_quake_data(
             y, [1, 12], magnitude_min, magnitude_max, True))
+        print("Year:{} Count:{}".format(y, len(r)))
 
         # f = open('./quake-' + str(y) + '.json', 'a')
     f = open(path, 'a')

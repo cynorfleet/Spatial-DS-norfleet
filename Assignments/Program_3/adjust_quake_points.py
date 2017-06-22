@@ -1,7 +1,9 @@
 import math
 import json
 import sys
+import os
 
+DIRPATH = os.path.dirname(os.path.realpath(__file__)) + '\\'
 
 def mercX(lon):
     """
@@ -49,7 +51,7 @@ def adjust_location_coords(extremes, points, width, height):
         x = float(x)
         y = float(y)
         xprime = (x - minx) / deltax         # val (0,1)
-        yprime = 1.0 - ((y - miny) / deltay) # val (0,1))
+        yprime = ((y - miny) / deltay) # val (0,1)
         adjx = int(xprime * width)
         adjy = int(yprime * height)
         adjusted.append((adjx, adjy))
@@ -90,6 +92,6 @@ def execute(jsonPath):
     adj = adjust_location_coords(extremes, points, screen_width, screen_height)
 
     # Save adjusted points
-    f = open('quake-2017-adjusted.json', 'w')
+    f = open(DIRPATH + 'quake-adjusted.json', 'w')
     f.write(json.dumps(adj, sort_keys=True, indent=4, separators=(',', ': ')))
     f.close()
